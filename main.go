@@ -9,29 +9,42 @@ import(
 )
 
 type Meta struct{
-	CHARACTER	string `json:"Character on the rise"`
-	PLAYER	    string `json:"Player"`
+	CHARACTER	string `json:"Trending Ultimate Character: "`
+	PLAYER	    string `json:"Trending Ultimate Player: "`
+	CHARACTERM  string `json:"Trending Melee Character: "`
+	PLAYERM	    string `json:"Trending Melee Player: "`
 }
 
 var metaData Meta
 
 func getMeta(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(metaData)
 }
 
 func handleSetChar(){
 	var c string
 	var p string
-	fmt.Println("What would you like to set CHARACTER too?")
+	var cm string
+	var pm string
+	fmt.Println("What would you like to set ULTIMATE CHARACTER too?")
 	fmt.Scanln(&c)
-	fmt.Println("Setting CHARACTER too")
+	fmt.Println("Setting ULTIMATE CHARACTER too")
 	fmt.Println(c)
-	fmt.Println("What would you like to set PLAYER too?")
+	fmt.Println("What would you like to set ULTIMATE PLAYER too?")
 	fmt.Scanln(&p)
-	fmt.Println("Setting PLAYER too")
-	fmt.Println(c);
-	metaData = Meta{CHARACTER: c, PLAYER: p}
+	fmt.Println("Setting ULTIMATE PLAYER too")
+	fmt.Println(c)
+	fmt.Println("What would you like to set MELEE CHARACTER too?")
+	fmt.Scanln(&cm)
+	fmt.Println("Setting MELEE CHARACTER too")
+	fmt.Println(cm)
+	fmt.Println("What would you like to set MELEE PLAYER too?")
+	fmt.Scanln(&pm)
+	fmt.Println("Setting MELEE PLAYER too")
+	fmt.Println(pm)
+	metaData = Meta{CHARACTER: c, PLAYER: p, CHARACTERM: cm, PLAYERM: pm}
 	fmt.Println(metaData)
 	fmt.Println("Thank you")
 	welcome();
@@ -54,6 +67,8 @@ func welcome(){
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/api/meta", getMeta).Methods("GET");
+	r.Use(mux.CORSMethodMiddleware(r))
+	//r.Header().Set("Access-Control-Allow-Origin", "*")
 	go welcome();
 	log.Fatal(http.ListenAndServe(":8000", r))
 }
