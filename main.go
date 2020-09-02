@@ -70,5 +70,5 @@ func main() {
 	r.Use(mux.CORSMethodMiddleware(r))
 	//r.Header().Set("Access-Control-Allow-Origin", "*")
 	go welcome();
-	log.Fatal(http.ListenAndServe(":8000", r))
+	log.Fatal(http.ListenAndServeTLS(":8000", "104.131.86.238.crt", "104.131.86.238.key", nil ))
 }
