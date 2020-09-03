@@ -7,6 +7,11 @@ import(
 	"fmt"
 	"github.com/gorilla/mux"
 	"crypto/tls"
+	"crypto/x509"
+)
+
+const (
+	localCertFile = "104.131.86.238.crt"
 )
 
 type Meta struct{
@@ -66,10 +71,45 @@ func welcome(){
 }
 
 func main() {
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	insecure := flag.Bool("insecure-ssl", false, "Accept/Ignore all server SSL certificates")
+	flag.Parse()
+
+	// Get the SystemCertPool, continue with an empty pool on error
+	rootCAs, _ := x509.SystemCertPool()
+	if rootCAs == nil {
+		rootCAs = x509.NewCertPool()
+	}
+
+	// Read in the cert file
+	certs, err := ioutil.ReadFile(localCertFile)
+	if err != nil {
+		log.Fatalf("Failed to append %q to RootCAs: %v", localCertFile, err)
+	}
+
+	// Append our cert to the system pool
+	if ok := rootCAs.AppendCertsFromPEM(certs); !ok {
+		log.Println("No certs appended, using system certs only")
+	}
+
+	// Trust the augmented cert pool in our client
+	config := &tls.Config{
+		InsecureSkipVerify: *insecure,
+		RootCAs:            rootCAs,
+	}
+	tr := &http.Transport{TLSClientConfig: config}
+	client := &http.Client{Transport: tr}
+
+	// Uses local self-signed cert
+	req := http.NewRequest(http.MethodGet, "https://localhost/api/version", nil)
+	resp, err := client.Do(req)
+	// Handle resp and err
+
+	// Still works with host-trusted CAs!
+	req = http.NewRequest(http.MethodGet, "https://example.com/", nil)
+	resp, err = client.Do(req)
 	r := mux.NewRouter()
 	r.HandleFunc("/api/meta", getMeta).Methods("GET");
 	r.Use(mux.CORSMethodMiddleware(r))
 	go welcome();
-	log.Fatal(http.ListenAndServeTLS(":8000", "104.131.86.238.crt", "104.131.86.238.key", nil ))
+	log.Fatal(http.ListenAndServeTLS(":8000", localCertFile, "104.131.86.238.key", nil ))
 }
