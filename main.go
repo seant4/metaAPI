@@ -8,6 +8,9 @@ import(
 	"github.com/gorilla/mux"
 	"crypto/tls"
 	"crypto/x509"
+	"flag"
+	"io/ioutil"
+	
 )
 
 const (
