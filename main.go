@@ -66,10 +66,10 @@ func welcome(){
 }
 
 func main() {
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	r := mux.NewRouter()
 	r.HandleFunc("/api/meta", getMeta).Methods("GET");
 	r.Use(mux.CORSMethodMiddleware(r))
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	go welcome();
 	log.Fatal(http.ListenAndServeTLS(":8000", "104.131.86.238.crt", "104.131.86.238.key", nil ))
 }
