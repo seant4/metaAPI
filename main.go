@@ -68,7 +68,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/api/meta", getMeta).Methods("GET");
 	r.Use(mux.CORSMethodMiddleware(r))
-	//r.Header().Set("Access-Control-Allow-Origin", "*")
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	go welcome();
 	log.Fatal(http.ListenAndServeTLS(":8000", "104.131.86.238.crt", "104.131.86.238.key", nil ))
 }
