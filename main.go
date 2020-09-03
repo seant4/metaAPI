@@ -10,7 +10,7 @@ import(
 	"crypto/x509"
 	"flag"
 	"io/ioutil"
-	
+
 )
 
 const (
@@ -103,13 +103,11 @@ func main() {
 	client := &http.Client{Transport: tr}
 
 	// Uses local self-signed cert
-	req := http.NewRequest(http.MethodGet, "https://localhost/api/version", nil)
+	req := http.NewRequest(http.MethodGet, "https://104.131.86.238/api/meta", nil)
 	resp, err := client.Do(req)
 	// Handle resp and err
 
 	// Still works with host-trusted CAs!
-	req = http.NewRequest(http.MethodGet, "https://example.com/", nil)
-	resp, err = client.Do(req)
 	r := mux.NewRouter()
 	r.HandleFunc("/api/meta", getMeta).Methods("GET");
 	r.Use(mux.CORSMethodMiddleware(r))
